@@ -1,79 +1,63 @@
 import React from 'react';
-import { Eye, EyeOff, Radio, Shield, HelpCircle, HardDrive } from 'lucide-react';
+import { Play, Shield, Wifi, Command, Terminal, ChevronDown } from 'lucide-react';
 
 export default function HUDNavbar({ isDecrypted, setIsDecrypted }) {
   return (
-    <nav className="fixed top-0 left-0 w-full z-50 bg-slate-950/40 backdrop-blur-md border-b border-cyan-500/10 px-4 md:px-8 py-3">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-        
-        {/* LOGO SECTOR: Levitating Anti-Gravity Core */}
-        <a href="#hero" className="flex items-center gap-3 group">
-          <div className="relative w-10 h-10 flex items-center justify-center">
-            {/* Spinning Gravity Rings */}
-            <svg className="absolute w-full h-full animate-spin" style={{ animationDuration: '10s' }} viewBox="0 0 100 100">
-              <circle cx="50" cy="50" r="40" fill="none" stroke="var(--accent-cyan)" strokeWidth="1.5" strokeDasharray="30 20" opacity="0.4" />
-            </svg>
-            <svg className="absolute w-full h-full animate-spin" style={{ animationDuration: '6s', animationDirection: 'reverse' }} viewBox="0 0 100 100">
-              <circle cx="50" cy="50" r="32" fill="none" stroke="var(--accent-green)" strokeWidth="1" strokeDasharray="15 15" opacity="0.6" />
-            </svg>
-            
-            {/* Suspended Core - Antigravity Float */}
-            <div className="relative w-4 h-4 rounded-full bg-gradient-to-tr from-cyan-400 to-emerald-400 group-hover:scale-125 transition-transform duration-300 animate-pulse" style={{ boxShadow: 'var(--glow-cyan)' }}>
-              <div className="absolute inset-0.5 rounded-full bg-white opacity-80 blur-[1px]"></div>
-            </div>
+    <header className="ide-topbar select-none">
+      
+      {/* Left side: IDE Menu & Brand */}
+      <div className="flex items-center gap-6">
+        <div className="flex items-center gap-2">
+          {/* Pulsating Nucleus */}
+          <div className="relative w-4 h-4 flex items-center justify-center">
+            <div className="absolute inset-0 rounded-full border border-violet-500/20 animate-ping"></div>
+            <div className="w-1.5 h-1.5 rounded-full bg-violet-400" />
           </div>
-          
-          <div className="flex flex-col">
-            <span className="font-hud font-black text-sm tracking-[0.25em] text-white flex items-center gap-1">
-              VOE<span className="text-cyan-400 group-hover:text-emerald-400 transition-colors">SMART</span>
-              <span className="text-[9px] font-mono border border-cyan-500/30 px-1 py-0.2 rounded bg-cyan-950/20 text-cyan-400">.DEV</span>
-            </span>
-            <span className="font-mono text-[8px] tracking-widest text-slate-500 uppercase">AI ENGINE & HIGH ARCH</span>
-          </div>
-        </a>
-
-        {/* Center telemetry stats */}
-        <div className="hidden lg:flex items-center gap-8 font-mono text-[10px] text-slate-400">
-          <div className="flex items-center gap-1.5">
-            <Radio size={12} className="text-cyan-400 animate-pulse" />
-            <span>SYS_SYNC: <span className="text-cyan-400 font-bold">ORBIT_01</span></span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Shield size={12} className="text-emerald-400" />
-            <span>SHIELD_SHELL: <span className="text-emerald-400 font-bold">99.8%</span></span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <HardDrive size={12} className="text-purple-400" />
-            <span>V_CORE: <span className="text-purple-400 font-bold">ACTIVE_26Y</span></span>
-          </div>
+          <span className="font-header font-black text-xs tracking-wider text-white flex items-center gap-1">
+            VOE<span className="text-violet-400">SMART</span>
+            <span className="text-[7px] font-mono text-slate-500 px-1 py-0.2 rounded border border-white/5 bg-white/[0.01]">v2.0</span>
+          </span>
         </div>
 
-        {/* Navigation & Decryptor Switch */}
-        <div className="flex items-center gap-4">
-          <a href="#security" className="hidden md:inline-block font-hud text-[10px] tracking-widest text-slate-400 hover:text-cyan-400 transition-colors uppercase">
-            Cofre Seguro
-          </a>
-          <a href="#contact" className="hidden md:inline-block font-hud text-[10px] tracking-widest text-slate-400 hover:text-cyan-400 transition-colors uppercase">
-            Terminal
-          </a>
-
-          {/* Master Decrypt Switch */}
-          <button
-            onClick={() => setIsDecrypted(!isDecrypted)}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded border transition-all duration-300 font-mono text-[10px] uppercase tracking-wider ${
-              isDecrypted 
-                ? 'border-emerald-500/40 bg-emerald-950/20 text-emerald-400 var(--glow-green)' 
-                : 'border-cyan-500/20 bg-slate-900/60 text-cyan-400 hover:border-cyan-400/40'
-            }`}
-            style={isDecrypted ? { boxShadow: 'var(--glow-green)' } : {}}
-            title={isDecrypted ? "Encriptar Dados da Página" : "Descriptografar Dados da Página"}
-          >
-            {isDecrypted ? <Eye size={12} className="animate-pulse" /> : <EyeOff size={12} />}
-            <span className="hidden sm:inline">{isDecrypted ? 'MODO: ABERTO' : 'DECRIPTAR_SITE'}</span>
-          </button>
+        {/* Windows style File menu actions */}
+        <div className="hidden lg:flex items-center gap-4 text-[10px] text-slate-400 font-sans">
+          <span className="hover:text-white transition-colors cursor-pointer">File</span>
+          <span className="hover:text-white transition-colors cursor-pointer">Edit</span>
+          <span className="hover:text-white transition-colors cursor-pointer">Selection</span>
+          <span className="hover:text-white transition-colors cursor-pointer">View</span>
+          <span className="hover:text-white transition-colors cursor-pointer">Run</span>
+          <span className="hover:text-white transition-colors cursor-pointer">Terminal</span>
+          <span className="hover:text-white transition-colors cursor-pointer text-violet-400 font-medium">Antigravity</span>
         </div>
-
       </div>
-    </nav>
+
+      {/* Center active search bar/document title */}
+      <div className="hidden md:flex items-center gap-2 px-6 py-1 rounded bg-[#040408] border border-white/[0.02] text-[10px] font-mono text-slate-400 w-96 justify-center">
+        <Command size={10} className="text-slate-600" />
+        <span>voesmart-core-ai — workspace: ~/site-voesmartdev</span>
+      </div>
+
+      {/* Right side: Sync telemetry & window buttons */}
+      <div className="flex items-center gap-5">
+        <div className="flex items-center gap-4 font-mono text-[9px] text-slate-500">
+          <div className="flex items-center gap-1 text-emerald-400">
+            <Wifi size={10} className="animate-pulse" />
+            <span>CONNECTED</span>
+          </div>
+          <div className="hidden sm:flex items-center gap-1 text-violet-400">
+            <Shield size={10} />
+            <span>Z-K AUTH: OK</span>
+          </div>
+        </div>
+
+        {/* Window action simulator */}
+        <div className="flex items-center gap-1.5 pl-3 border-l border-white/[0.04]">
+          <div className="w-2.5 h-2.5 rounded-full bg-slate-800 hover:bg-slate-700 cursor-pointer"></div>
+          <div className="w-2.5 h-2.5 rounded-full bg-slate-800 hover:bg-slate-700 cursor-pointer"></div>
+          <div className="w-2.5 h-2.5 rounded-full bg-slate-800 hover:bg-red-950 text-red-500 cursor-pointer"></div>
+        </div>
+      </div>
+
+    </header>
   );
 }

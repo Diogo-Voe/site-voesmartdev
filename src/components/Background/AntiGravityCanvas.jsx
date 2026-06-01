@@ -12,24 +12,19 @@ export default function AntiGravityCanvas() {
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
-    // Track mouse coordinates and velocity
+    // Track mouse coordinates
     const mouse = {
       x: -1000,
       y: -1000,
-      vx: 0,
-      vy: 0,
-      lastX: -1000,
-      lastY: -1000,
-      radius: 180, // Repulsion boundary
+      radius: 200, // gravitational lens radius
     };
+
+    // Track click ripples (Gravity Shockwaves)
+    let ripples = [];
 
     const handleMouseMove = (e) => {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
-      mouse.vx = mouse.x - mouse.lastX;
-      mouse.vy = mouse.y - mouse.lastY;
-      mouse.lastX = mouse.x;
-      mouse.lastY = mouse.y;
     };
 
     const handleMouseLeave = () => {
@@ -37,147 +32,167 @@ export default function AntiGravityCanvas() {
       mouse.y = -1000;
     };
 
+    const handleMouseDown = (e) => {
+      ripples.push({
+        x: e.clientX,
+        y: e.clientY,
+        radius: 0,
+        maxRadius: 250,
+        speed: 4,
+        force: 8,
+      });
+    };
+
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseleave', handleMouseLeave);
+    window.addEventListener('mousedown', handleMouseDown);
 
     const handleResize = () => {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
-      initParticles();
+      initStars();
     };
     window.addEventListener('resize', handleResize);
 
-    // Particle Setup
-    let particles = [];
-    const particleCount = Math.min(100, Math.floor((width * height) / 15000));
+    // Star Class (Micro-Stardust)
+    let stars = [];
 
-    class Particle {
+    class Star {
       constructor() {
         this.reset();
-        // Scatter initially across full canvas
-        this.x = Math.random() * width;
-        this.y = Math.random() * height;
       }
 
       reset() {
-        // Original grid/anchor points that they drift back to
-        this.anchorX = Math.random() * width;
-        this.anchorY = Math.random() * height;
-        this.x = this.anchorX;
-        this.y = this.anchorY;
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        
+        // Orbital center and speed
+        this.centerX = width / 2;
+        this.centerY = height / 2;
+        this.angle = Math.random() * Math.PI * 2;
+        this.orbitRadius = Math.random() * Math.max(width, height) * 0.8;
+        this.orbitSpeed = (Math.random() * 0.0002 + 0.00005) * (Math.random() > 0.5 ? 1 : -1);
+
+        this.size = Math.random() * 1.5 + 0.5;
+        this.alpha = Math.random() * 0.4 + 0.1;
+        this.colorType = Math.random() > 0.35 ? 'violet' : 'green';
+        
+        // Ripple velocities
         this.vx = 0;
         this.vy = 0;
-        
-        // Custom properties
-        this.size = Math.random() * 2.5 + 0.8;
-        this.baseAlpha = Math.random() * 0.4 + 0.15;
-        this.alpha = this.baseAlpha;
-        this.colorType = Math.random() > 0.4 ? 'cyan' : 'green'; // themed colors
-        this.springStiffness = Math.random() * 0.005 + 0.002; // slow spring-back
-        this.damping = Math.random() * 0.04 + 0.92; // smooth deceleration
       }
 
       update() {
-        // 1. Spring-back force to original anchor point (creates floating/hovering effect)
-        const dxAnchor = this.anchorX - this.x;
-        const dyAnchor = this.anchorY - this.y;
-        this.vx += dxAnchor * this.springStiffness;
-        this.vy += dyAnchor * this.springStiffness;
+        // 1. Base orbit movement
+        this.angle += this.orbitSpeed;
+        
+        // Standard position
+        const targetX = this.centerX + Math.cos(this.angle) * this.orbitRadius;
+        const targetY = this.centerY + Math.sin(this.angle) * this.orbitRadius;
 
-        // 2. Mouse Antigravity Repulsion
-        if (mouse.x > -500) {
-          const dxMouse = this.x - mouse.x;
-          const dyMouse = this.y - mouse.y;
-          const distMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
+        // Apply friction/decay to ripple velocities
+        this.vx *= 0.95;
+        this.vy *= 0.95;
 
-          if (distMouse < mouse.radius) {
-            // Stronger push when closer, fading at the edges
-            const force = (mouse.radius - distMouse) / mouse.radius;
-            const pushX = (dxMouse / distMouse) * force * 1.5;
-            const pushY = (dyMouse / distMouse) * force * 1.5;
+        // Add orbital trajectory + ripple displacements
+        this.x = targetX + this.vx;
+        this.y = targetY + this.vy;
 
-            this.vx += pushX;
-            this.vy += pushY;
-            
-            // Brighten particle near cursor
-            this.alpha = Math.min(0.9, this.baseAlpha + force * 0.5);
-          } else {
-            // Decay alpha back to base
-            this.alpha += (this.baseAlpha - this.alpha) * 0.1;
+        // 2. Ripple/Shockwave physics
+        ripples.forEach((rp) => {
+          const dx = this.x - rp.x;
+          const dy = this.y - rp.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          // If ripple boundary sweeps over the star
+          if (dist > rp.radius - 15 && dist < rp.radius + 15) {
+            const force = (rp.maxRadius - rp.radius) / rp.maxRadius * rp.force;
+            this.vx += (dx / dist) * force;
+            this.vy += (dy / dist) * force;
           }
-        } else {
-          this.alpha += (this.baseAlpha - this.alpha) * 0.1;
+        });
+
+        // Wrap boundaries
+        if (this.x < -100 || this.x > width + 100 || this.y < -100 || this.y > height + 100) {
+          this.reset();
         }
-
-        // Apply friction/damping
-        this.vx *= this.damping;
-        this.vy *= this.damping;
-
-        // Apply movement
-        this.x += this.vx;
-        this.y += this.vy;
-
-        // Soft boundaries / wrap anchors if window resized
-        if (this.anchorX > width) this.anchorX = Math.random() * width;
-        if (this.anchorY > height) this.anchorY = Math.random() * height;
       }
 
       draw() {
+        // 3. Gravitational Lens Warp Calculation
+        // We warp the RENDERED coordinates, not the physical coordinates
+        let renderX = this.x;
+        let renderY = this.y;
+
+        if (mouse.x > -500) {
+          const dx = this.x - mouse.x;
+          const dy = this.y - mouse.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < mouse.radius) {
+            // Gravitational bending formula (distortion bubble)
+            const bendFactor = Math.sin((dist / mouse.radius) * Math.PI / 2);
+            // Warp coordinates slightly away/curving around lens
+            const scale = 1 + (1 - bendFactor) * 0.35; 
+            renderX = mouse.x + dx * scale;
+            renderY = mouse.y + dy * scale;
+          }
+        }
+
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        const color = this.colorType === 'cyan' ? '0, 240, 255' : '0, 255, 136';
+        ctx.arc(renderX, renderY, this.size, 0, Math.PI * 2);
+        const color = this.colorType === 'violet' ? '139, 92, 246' : '0, 255, 136';
         ctx.fillStyle = `rgba(${color}, ${this.alpha})`;
-        ctx.shadowColor = `rgba(${color}, ${this.alpha})`;
-        ctx.shadowBlur = this.size > 2 ? 8 : 0;
         ctx.fill();
-        ctx.shadowBlur = 0; // reset
       }
     }
 
-    const initParticles = () => {
-      particles = [];
-      const dynamicCount = Math.min(100, Math.floor((width * height) / 15000));
-      for (let i = 0; i < dynamicCount; i++) {
-        particles.push(new Particle());
+    const initStars = () => {
+      stars = [];
+      const count = Math.min(220, Math.floor((width * height) / 8000));
+      for (let i = 0; i < count; i++) {
+        stars.push(new Star());
       }
     };
 
-    initParticles();
+    initStars();
 
-    // Loop & Mesh Connector
     const animate = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // Update and draw particles
-      particles.forEach((p) => {
-        p.update();
-        p.draw();
+      // Update ripples
+      ripples = ripples.filter((rp) => {
+        rp.radius += rp.speed;
+        return rp.radius < rp.maxRadius;
       });
 
-      // Connect particles close to each other (Neural Constellation Mesh)
-      ctx.lineWidth = 0.5;
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const p1 = particles[i];
-          const p2 = particles[j];
+      // Draw faint gravity shockwave rings
+      ripples.forEach((rp) => {
+        const pct = (rp.maxRadius - rp.radius) / rp.maxRadius;
+        ctx.beginPath();
+        ctx.arc(rp.x, rp.y, rp.radius, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(139, 92, 246, ${pct * 0.15})`;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      });
 
-          const dx = p1.x - p2.x;
-          const dy = p1.y - p2.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < 110) {
-            // Draw link line
-            const alpha = (110 - dist) / 110 * 0.08;
-            ctx.beginPath();
-            ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(p2.x, p2.y);
-            // Blend colors based on particle types
-            const color = p1.colorType === 'cyan' ? '0, 240, 255' : '0, 255, 136';
-            ctx.strokeStyle = `rgba(${color}, ${alpha})`;
-            ctx.stroke();
-          }
-        }
+      // Draw active gravity lens aura (subtle concentric ripples near mouse)
+      if (mouse.x > -500) {
+        ctx.beginPath();
+        ctx.arc(mouse.x, mouse.y, mouse.radius, 0, Math.PI * 2);
+        const grad = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, mouse.radius);
+        grad.addColorStop(0, 'rgba(139, 92, 246, 0.03)');
+        grad.addColorStop(0.5, 'rgba(0, 255, 136, 0.01)');
+        grad.addColorStop(1, 'rgba(139, 92, 246, 0)');
+        ctx.fillStyle = grad;
+        ctx.fill();
       }
+
+      // Render stars
+      stars.forEach((st) => {
+        st.update();
+        st.draw();
+      });
 
       animationFrameId = requestAnimationFrame(animate);
     };
@@ -187,6 +202,7 @@ export default function AntiGravityCanvas() {
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseleave', handleMouseLeave);
+      window.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animationFrameId);
     };

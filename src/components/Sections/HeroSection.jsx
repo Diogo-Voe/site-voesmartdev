@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import DecryptText from '../HUD/DecryptText';
-import TelemetryPanel from '../HUD/TelemetryPanel';
+import BlurDecrypt from '../HUD/BlurDecrypt';
+import MinimalPanel from '../HUD/MinimalPanel';
 import { Cpu, Terminal, ArrowRight, ShieldCheck, Zap } from 'lucide-react';
 
 const SUBHEADINGS = [
@@ -11,106 +11,103 @@ const SUBHEADINGS = [
 ];
 
 export default function HeroSection({ isDecrypted }) {
-  const [headingIndex, setHeadingIndex] = useState(0);
   const [subText, setSubText] = useState(SUBHEADINGS[0]);
 
   useEffect(() => {
+    let index = 0;
     const interval = setInterval(() => {
-      setHeadingIndex((prev) => {
-        const next = (prev + 1) % SUBHEADINGS.length;
-        setSubText(SUBHEADINGS[next]);
-        return next;
-      });
-    }, 4500);
+      index = (index + 1) % SUBHEADINGS.length;
+      setSubText(SUBHEADINGS[index]);
+    }, 4000);
 
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <section id="hero" className="relative pt-32 pb-20 z-10 flex flex-col items-center justify-center min-h-screen container mx-auto px-4 md:px-8">
+    <section id="hero" className="relative pt-40 pb-20 z-10 flex flex-col items-center justify-center min-h-screen container mx-auto px-6 md:px-12 text-center">
       
-      {/* HUD Warning Strip */}
-      <div className="flex items-center gap-2 px-4 py-1.5 rounded border border-cyan-500/20 bg-slate-950/60 font-mono text-[9px] tracking-widest text-cyan-400 mb-8 animate-pulse">
-        <span className="w-2 h-2 bg-cyan-400 rounded-full animate-ping"></span>
-        SYSTEM_DIAGNOSTIC: ACTIVE_GRID_ON_0x5F3E
+      {/* Floating status flag */}
+      <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/5 bg-white/[0.02] font-mono text-[9px] tracking-[0.2em] text-slate-400 mb-8 animate-pulse">
+        <span className="w-1.5 h-1.5 bg-violet-400 rounded-full"></span>
+        SYSTEM_DIAGNOSTIC: SECURE_CORE_ONLINE
       </div>
 
-      {/* Primary Brand Pitch */}
-      <div className="text-center max-w-4xl">
-        <h1 className="text-4xl sm:text-6xl md:text-8xl font-hud font-black tracking-tight leading-tight text-white select-none">
-          <span className="text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-slate-400">VOESMART</span>
+      {/* Giant Fashionable Typography */}
+      <div className="max-w-5xl">
+        <h1 className="text-5xl sm:text-7xl md:text-9xl font-header font-black tracking-tight leading-[0.9] text-white">
+          VOESMART
           <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-emerald-400 to-cyan-300 drop-shadow-[0_0_20px_rgba(0,240,255,0.2)]">
+          <span className="outline-text block mt-2">
             ENGINEERING
           </span>
         </h1>
 
-        {/* Dynamic Telemetry Subheading with Glitch Effect */}
-        <div className="h-8 mt-6 mb-8 flex justify-center items-center">
-          <span className="font-mono text-xs sm:text-sm tracking-[0.2em] text-emerald-400 font-bold flex items-center gap-2">
-            <Terminal size={14} className="animate-pulse" />
-            [SYS_MODE: <DecryptText text={subText} forceDecrypt={isDecrypted} speed={15} />]
+        {/* Dynamic Telemetry Subheading */}
+        <div className="h-6 mt-8 mb-8 flex justify-center items-center">
+          <span className="font-mono text-[10px] tracking-[0.25em] text-emerald-400 font-medium flex items-center gap-2">
+            <Terminal size={12} className="animate-pulse" />
+            [SYS_STATE: <BlurDecrypt text={subText} forceDecrypt={isDecrypted} />]
           </span>
         </div>
 
-        <p className="text-slate-400 max-w-2xl mx-auto mb-12 font-body text-base leading-relaxed">
-          Desenvolvemos landing pages e ecossistemas web imersivos de altíssima performance. Nossa tecnologia de ponta oculta dados críticos, garante segurança de nível governamental e entrega o carregamento mais rápido do mercado.
+        <p className="text-slate-400 max-w-2xl mx-auto mb-12 font-body text-base font-light leading-relaxed">
+          Desenvolvemos ecossistemas web e landing pages de altíssima performance. Nossa engenharia exclusiva garante blindagem completa dos dados e velocidades de carregamento líderes do ecossistema.
         </p>
 
-        {/* Call to Actions */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20">
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-24">
           <a href="#contact">
-            <button className="neon-btn flex items-center gap-2 group">
+            <button className="cosmic-btn violet flex items-center gap-2 group">
               INICIAR PROJETO
-              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform duration-300" />
             </button>
           </a>
           <a href="#security">
-            <button className="neon-btn green flex items-center gap-2">
+            <button className="cosmic-btn green flex items-center gap-2">
               DESCRIPTOGRAFAR NÚCLEO
             </button>
           </a>
         </div>
       </div>
 
-      {/* Grid of 3 Telemetry Summary Panels */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-6xl mt-10">
+      {/* Grid of 3 Floaty Metric Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl mt-12 text-left">
         
-        <TelemetryPanel title="VELOCITY_MATRIX" theme="cyan" statusText="0.18s">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 rounded bg-cyan-950/30 text-cyan-400 border border-cyan-500/20">
+        <MinimalPanel title="SPEED_RATIO" accent="violet" statusText="0.18s">
+          <div className="flex items-center gap-3.5 mb-3">
+            <div className="p-2.5 rounded-full bg-violet-950/20 text-violet-400 border border-violet-500/10">
               <Zap size={18} className="animate-pulse" />
             </div>
-            <h4 className="font-hud font-bold text-xs tracking-wider text-white">LANDINGS ULTRA RÁPIDAS</h4>
+            <h4 className="font-header font-bold text-xs tracking-wider text-white">LANDINGS ULTRA RÁPIDAS</h4>
           </div>
-          <p className="text-xs text-slate-400 leading-relaxed font-body">
-            Design centrado em otimização de ativos estáticos. Código compilado em Vite com performance 100/100 na auditoria Lighthouse do Google.
+          <p className="text-xs text-slate-400 font-light leading-relaxed">
+            Otimização estática em nível de compilador. Códigos leves gerados no ecossistema Vite com pontuação 100/100 na auditoria do Google Lighthouse.
           </p>
-        </TelemetryPanel>
+        </MinimalPanel>
 
-        <TelemetryPanel title="SHIELD_METRIC" theme="green" statusText="SECURE">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 rounded bg-emerald-950/30 text-emerald-400 border border-emerald-500/20">
+        <MinimalPanel title="PRIVACY_PROTOCOL" accent="green" statusText="SECURE">
+          <div className="flex items-center gap-3.5 mb-3">
+            <div className="p-2.5 rounded-full bg-emerald-950/20 text-emerald-400 border border-emerald-500/10">
               <ShieldCheck size={18} />
             </div>
-            <h4 className="font-hud font-bold text-xs tracking-wider text-white">OFUSCAÇÃO DE DADOS</h4>
+            <h4 className="font-header font-bold text-xs tracking-wider text-white">OFUSCAÇÃO DE DADOS</h4>
           </div>
-          <p className="text-xs text-slate-400 leading-relaxed font-body">
-            Algoritmos defensivos que impedem inspeção indevida dos dados e injetam camadas de criptografia ZK (Zero-Knowledge) em tempo real.
+          <p className="text-xs text-slate-400 font-light leading-relaxed">
+            Sistemas defensivos que ocultam informações sensíveis e aplicam camadas de segurança Zero-Knowledge na transmissão de dados da sua empresa.
           </p>
-        </TelemetryPanel>
+        </MinimalPanel>
 
-        <TelemetryPanel title="VETERAN_COMMAND" theme="purple" statusText="26_YRS">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 rounded bg-purple-950/30 text-purple-400 border border-purple-500/20">
+        <MinimalPanel title="VETERAN_HISTORY" accent="violet" statusText="26_YEARS">
+          <div className="flex items-center gap-3.5 mb-3">
+            <div className="p-2.5 rounded-full bg-violet-950/20 text-violet-400 border border-violet-500/10">
               <Cpu size={18} />
             </div>
-            <h4 className="font-hud font-bold text-xs tracking-wider text-white">26 ANOS DE ESTRADA</h4>
+            <h4 className="font-header font-bold text-xs tracking-wider text-white">26 ANOS DE EXP</h4>
           </div>
-          <p className="text-xs text-slate-400 leading-relaxed font-body">
-            Arquitetura resiliente moldada por mais de duas décadas de experiência lidando com sistemas de alta disponibilidade e escala.
+          <p className="text-xs text-slate-400 font-light leading-relaxed">
+            Duas décadas e meia escalando softwares de altíssima escala e complexidade para governos, finanças e grandes corporações multinacionais.
           </p>
-        </TelemetryPanel>
+        </MinimalPanel>
 
       </div>
 
